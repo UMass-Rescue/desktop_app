@@ -8,6 +8,7 @@ import MapView from 'react-native-maps';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 import { Marker } from "react-native-maps";
+import moment from 'moment';
 
 class MyCalendar extends React.Component {
   months = ["January", "February", "March", "April", 
@@ -182,12 +183,47 @@ const num  = 0;
 function CaseNumber({ navigation }) {
   const [text, onChangeText] = React.useState("Enter Case Number");
   const [number, onChangeNumber] = React.useState(null);
-  const [date_start, startDate] = React.useState(0); 
-  const [date_end, endDate] = React.useState(0); 
+  const [date_start, startDate] = React.useState('2022-03-04'); 
+  const [date_end, endDate] = React.useState('2022-03-09'); 
+
   const vacation = {key: 'vacation', color: 'red', selectedDotColor: 'blue'};
   const massage = {key: 'massage', color: 'blue', selectedDotColor: 'blue'};
   const workout = {key: 'workout', color: 'green'};
   const [showCalendar, stateCalendar] = React.useState(false);
+  const [markedDates, setMarkedDates] = React.useState({
+    '2022-03-20': {textColor: 'green'},
+    '2022-03-22': {startingDay: true, color: 'green'},
+    '2022-03-23': {selected: true, endingDay: true, color: 'green', textColor: 'gray'},
+    '2022-03-04': {disabled: true, startingDay: true, color: 'green', endingDay: true}
+  })
+
+  const combinedFunctions = () =>{
+    date_start = startDate.getDate
+    date_end = endDate.getDate
+}
+
+
+  const changeDate = () =>{
+      date_start = startDate.getDate
+      date_end = endDate.getDate
+  }
+
+  const handleDayPress = (day) => {
+
+
+    setMarkedDates({
+      [date_start]: {
+        startingDay: true, color: 'green'
+      },
+      [date_end]: {
+         endingDay: true,color: 'green'
+      },
+
+    
+
+    })
+  }
+
 
   return (
     
@@ -197,11 +233,11 @@ function CaseNumber({ navigation }) {
 
           <Text>Start Date:</Text>
 
-          <TextInput placeholder="1/03/2022" placeholderTextColor="gray" style={styles.input} />
+          <TextInput placeholder="YYYY-MM-DD" placeholderTextColor="gray" style={styles.input} />
       </View>
       <View style={{flex:1}}>
       <Text>End Date:</Text>
-          <TextInput placeholder="01/04/2022" placeholderTextColor="gray" style={styles.input} />
+          <TextInput placeholder="YYYY-MM-DD" placeholderTextColor="gray" style={styles.input} />
       </View>
      </View>
 
@@ -235,41 +271,11 @@ function CaseNumber({ navigation }) {
     
     
         {showCalendar ? (<Calendar
-              markingType={'multi-dot'}
+            markingType={'period'}
 
-          markedDates={{
-        '2022-03-16': {selected: true, marked: true, selectedColor: 'blue'},
-        '2022-03-17': {dots: [vacation, massage, workout],marked: true},
-        '2022-03-18': {dots: [vacation, massage, workout],marked: true, dotColor: 'red', activeOpacity: 0},
-        '2022-03-25': {dots: [workout], selected: true, selectedColor: 'red'},
-
-        '2022-03-19': {dots: [vacation, workout],disabled: true, disableTouchEvent: true}
-      }}
-              // Initially visible month. Default = Date()
-              current={'2022-03-05'}
-              // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
-              minDate={'2032-05-10'}
-              // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-              maxDate={'2032-05-30'}
-              // Handler which gets executed on day press. Default = undefined
-              onDayPress={day => {
-                console.log('selected day', day);
-              }}
-              // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
-              monthFormat={'yyyy MM'}
-              // Handler which gets executed when visible month changes in calendar. Default = undefined
-              onMonthChange={month => {
-                console.log('month changed', month);
-              }}
-              // Hide month navigation arrows. Default = false
-              hideArrows={false}
-              // Do not show days of other months in month page. Default = false
-              hideExtraDays={true}
-              // If hideArrows=false and hideExtraDays=false do not swich month when tapping on greyed out
-              // day from another month that is visible in calendar page. Default = false
-              disableMonthChange={false}
-              // If firstDay=1 week starts from Monday. Note that dayNames and dayNamesShort should still start from Sunday.
-              firstDay={1}
+         markedDates={markedDates}
+         onDayPress={handleDayPress}
+             
             />
         ) : null}
 
