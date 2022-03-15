@@ -9,6 +9,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 import { Marker } from "react-native-maps";
 import moment from 'moment';
+import '@mobiscroll/react/dist/css/mobiscroll.min.css';
+import { Datepicker } from '@mobiscroll/react';
 
 class MyCalendar extends React.Component {
   months = ["January", "February", "March", "April", 
@@ -183,8 +185,6 @@ const num  = 0;
 function CaseNumber({ navigation }) {
   const [text, onChangeText] = React.useState("Enter Case Number");
   const [number, onChangeNumber] = React.useState(null);
-  const [date_start, startDate] = React.useState('2022-03-04'); 
-  const [date_end, endDate] = React.useState('2022-03-09'); 
 
   const vacation = {key: 'vacation', color: 'red', selectedDotColor: 'blue'};
   const massage = {key: 'massage', color: 'blue', selectedDotColor: 'blue'};
@@ -197,29 +197,16 @@ function CaseNumber({ navigation }) {
     '2022-03-04': {disabled: true, startingDay: true, color: 'green', endingDay: true}
   })
 
-  const combinedFunctions = () =>{
-    date_start = startDate.getDate
-    date_end = endDate.getDate
-}
-
-
-  const changeDate = () =>{
-      date_start = startDate.getDate
-      date_end = endDate.getDate
-  }
 
   const handleDayPress = (day) => {
 
+    newDates[selectedDate]={selected: true, marked: true, selectedColor: Colors.YELLOW};
 
     setMarkedDates({
-      [date_start]: {
-        startingDay: true, color: 'green'
-      },
-      [date_end]: {
-         endingDay: true,color: 'green'
-      },
 
-    
+      [day.dateString]: {
+        selected: true, marked: true, selectedColor: "blue"
+      },
 
     })
   }
@@ -270,13 +257,15 @@ function CaseNumber({ navigation }) {
     </View>
     
     
-        {showCalendar ? (<Calendar
-            markingType={'period'}
-
-         markedDates={markedDates}
-         onDayPress={handleDayPress}
-             
-            />
+        {showCalendar ? (<Datepicker
+            theme="ios" 
+            themeVariant="light"
+            controls={['calendar']}
+            display="inline"
+            rangeSelectMode="wizard"
+            select="range"
+            showRangeLabels={true}
+        />
         ) : null}
 
     <Separator />
