@@ -9,9 +9,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 import { Marker } from "react-native-maps";
 import moment from 'moment';
-import '@mobiscroll/react/dist/css/mobiscroll.min.css';
-import { Datepicker } from '@mobiscroll/react';
-
+//import '@mobiscroll/react/dist/css/mobiscroll.min.css';
+//import { Datepicker } from '@mobiscroll/react';
+import axios from 'axios'; 
+import { RectButton } from 'react-native-gesture-handler';
 class MyCalendar extends React.Component {
   months = ["January", "February", "March", "April", 
  "May", "June", "July", "August", "September", "October", 
@@ -137,44 +138,13 @@ const newTaskData = [{
   data: [
     {
       id: "1",
-      task: "Agent A"
+      task: "Agent A: 2345"
     },
     {
       id: "2",
-      task: "Agent B"
+      task: "Agent B: 2373"
     },
-    {
-      id: "3",
-      task: "Agent C"
-    },
-    {
-      id: "4",
-      task: "Agent D"
-    },
-    {
-      id: "5",
-      task: "Agent E"
-    },
-    {
-      id: "6",
-      task: "Agent F"
-    },
-    {
-      id: "7",
-      task: "Agent G"
-    },
-    {
-      id: "8",
-      task: "Agent H"
-    },
-    {
-      id: "9",
-      task: "Agent H"
-    },
-    {
-      id: "10",
-      task: "Agent I"
-    },
+   
   ]
 }];
 
@@ -257,16 +227,7 @@ function CaseNumber({ navigation }) {
     </View>
     
     
-        {showCalendar ? (<Datepicker
-            theme="ios" 
-            themeVariant="light"
-            controls={['calendar']}
-            display="inline"
-            rangeSelectMode="wizard"
-            select="range"
-            showRangeLabels={true}
-        />
-        ) : null}
+  
 
     <Separator />
   
@@ -282,27 +243,82 @@ function InvestigatorCanvas({ navigation }) {
   const [text, onChangeText] = React.useState("Enter Case Number");
   const [number, onChangeNumber] = React.useState(null);
   const [showList, state] = React.useState(false);
+  const [result, setResult] =  React.useState("Test"); 
+  const [address, setAddress] = React.useState('');
 
+  const message = async() => { 
+    
+    try{
+
+    
+    axios.get('http://127.0.0.1:8000/recievedAddress/')
+    .then((response) =>  {
+      console.log(response)
+      setResult(response.data.message)
+    
+    }); 
+
+    console.log(result)
+    //let result = res.data; 
+  } catch(e){
+    console.log("Here")
+    console.log(e)
+  }
+
+}
+
+const sendAddress = () => {
+  axios.post('http://127.0.0.1:8000/recievedAddress/', {'address': address})
+    .then(res => {
+      
+      console.log(res)
+      console.log(address)
+    });
+
+    try{
+      axios.get('http://127.0.0.1:8000/sentID/')
+      .then((response) =>  {
+        console.log(response)
+        setResult(response.data.message)
+      
+      }); 
+  
+      console.log(result)
+      //let result = res.data; 
+    } catch(e){
+      console.log("Here")
+      console.log(e)
+    }
+};
 
   return (
     <View>
      
     <View style={{flexDirection:"row"}}>
       <View style={{flex:1}}>
-          <TextInput placeholder="Latitude" placeholderTextColor="gray" style={styles.input} />
-      </View>
-      <View style={{flex:1}}>
-          <TextInput placeholder="Longitude"  placeholderTextColor="gray" style={styles.input} />
+            <Text>
+              {result} 
+            </Text>
+          <TextInput placeholder="Input Address" 
+          placeholderTextColor="gray" 
+          onChangeText={newText => setAddress(newText)}
+          defaultValue={address}
+          style={styles.input} />
       </View>
      </View>
+     
      <View style={{flexDirection:"column"}}>
      <View>
-
+     <Text>
+        {address} 
+      </Text>
      <Button
         title="Available Investigators"
         color="#669fa8"
-        onPress={() => state(!showList)}
+        onPress={() => sendAddress()}
       />
+  
+
   </View>
      
      <Button
@@ -344,7 +360,22 @@ function CustomMarker({ name }) {
   );
 }
 
+function CustomMarkerAgents({ id }) {
+  return (
+    <View style={styles.circle}>
+      <Text style={styles.pinText}>{id}</Text>
+    </View>
+  );
+}
+
 function MapScreen() {
+  const location = {
+    latitude: 37.7895,
+    longitude: -122.445,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  };
+
   const coordinate1 = {
     latitude: 37.7885,
     longitude: -122.435,
@@ -406,6 +437,8 @@ function MapScreen() {
     longitudeDelta: 0.01,
   };
 
+  
+
 
   return (
       <View style={styles.containerMap}>
@@ -420,27 +453,30 @@ function MapScreen() {
           longitudeDelta: 0.0421,
         }}
         >
-         <Marker coordinate={coordinate1}>
-          <CustomMarker name="Agent A"/>
+         <Marker coordinate={location}>
+          <CustomMarker name="Location"/>
         </Marker>
-         <Marker coordinate={coordinate2} >
-          <CustomMarker name="Agent B"/>
+
+        <Marker coordinate={coordinate6}>
+          <CustomMarkerAgents id="2373"/>
         </Marker>
-         <Marker coordinate={coordinate3} >
-          <CustomMarker name="Agent C"/>
+        <Marker coordinate={coordinate6} />
+
+        <Marker coordinate={coordinate1}>
+          <CustomMarkerAgents id="2345"/>
         </Marker>
-         <Marker coordinate={coordinate4} >
-          <CustomMarker name="Agent D"/>
-        </Marker>
-         <Marker coordinate={coordinate5} />
-         <Marker coordinate={coordinate6} />
-         <Marker coordinate={coordinate7} />
-         <Marker coordinate={coordinate8} />
-         <Marker coordinate={coordinate9} />
-         <Marker coordinate={coordinate10} />
+
+         <Marker coordinate={coordinate1} />
+
 
       </MapView>
+
+ 
+
+
     </View>
+
+    
   );
 }
 
@@ -552,6 +588,22 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     elevation: 10,
   },
+  circle: {
+    width: 30,
+    height: 30,
+    borderRadius: 30 / 2,
+    backgroundColor: 'yellow',
+    //elevation: 10,
+},
+pinText: {
+    color: 'black',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 10,
+    marginTop: 10, 
+    marginBottom: 5,
+    position: "absolute",
+},
   text: {
   color: "#fff",   
   },
