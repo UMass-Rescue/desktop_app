@@ -245,36 +245,39 @@ function InvestigatorCanvas({ navigation }) {
   const [showList, state] = React.useState(false);
   const [result, setResult] =  React.useState("Test"); 
   const [address, setAddress] = React.useState('');
+  const [id_agents, setID] = React.useState('');
 
-  const message = async() => { 
-    
-    try{
 
-    
-    axios.get('http://127.0.0.1:8000/recievedAddress/')
-    .then((response) =>  {
-      console.log(response)
-      setResult(response.data.message)
-    
-    }); 
-
-    console.log(result)
-    //let result = res.data; 
-  } catch(e){
-    console.log("Here")
-    console.log(e)
-  }
-
-}
-
+  const [listSection, setListSection] = React.useState({
+    title: "Avaliable",
+     data: [
+      {
+        id: "1",
+        task: "Agent A: 2345"
+      },
+      {
+        id: "2",
+        task: "Agent B: 2373"
+      },
+     
+    ]
+  })
 const sendAddress = () => {
   axios.post('http://127.0.0.1:8000/recievedAddress/', {'address': address})
     .then(res => {
-      
+      console.log("RESULT")
       console.log(res)
+      console.log(res.data.address)
+      console.log("RESULT")
+
+      setID(res.data.address)
+    }
+    
+    ).catch(e => {
+      console.log(e)
       console.log(address)
     });
-
+/*
     try{
       axios.get('http://127.0.0.1:8000/sentID/')
       .then((response) =>  {
@@ -288,7 +291,7 @@ const sendAddress = () => {
     } catch(e){
       console.log("Here")
       console.log(e)
-    }
+    }*/
 };
 
   return (
@@ -297,7 +300,7 @@ const sendAddress = () => {
     <View style={{flexDirection:"row"}}>
       <View style={{flex:1}}>
             <Text>
-              {result} 
+              {id_agents} 
             </Text>
           <TextInput placeholder="Input Address" 
           placeholderTextColor="gray" 
