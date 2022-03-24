@@ -13,7 +13,7 @@ services:
       - 5432:5432
   
   server:
-    image: 'docker.pkg.github.com/umass-rescue/596-s22-backend/backend:sha-e5a1571'
+    image: 'docker.pkg.github.com/umass-rescue/596-s22-backend/backend:latest'
     depends_on:
       - db
     volumes:
