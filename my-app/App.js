@@ -133,20 +133,6 @@ const Separator = () => (
   <View style={styles.separator} />
 );
 
-const newTaskData = [{
-  title: "Avaliable",
-  data: [
-    {
-      id: "1",
-      task: "Agent A: 2345"
-    },
-    {
-      id: "2",
-      task: "Agent B: 2373"
-    },
-   
-  ]
-}];
 
 
 const Stack = createNativeStackNavigator();
@@ -246,31 +232,52 @@ function InvestigatorCanvas({ navigation }) {
   const [result, setResult] =  React.useState("Test"); 
   const [address, setAddress] = React.useState('');
   const [id_agents, setID] = React.useState('');
+const [listSection, setListSection] = React.useState([{
+  title: "Avaliable",
+   data: [
+    {
+      id: "1",
+      task: "Agent A: 2345"
+    },
+    {
+      id: "2",
+      task: "Agent B: 2373"
+    },
+   
+  ]
+}]);
 
 
-  const [listSection, setListSection] = React.useState({
-    title: "Avaliable",
-     data: [
-      {
-        id: "1",
-        task: "Agent A: 2345"
-      },
-      {
-        id: "2",
-        task: "Agent B: 2373"
-      },
-     
-    ]
-  })
 const sendAddress = () => {
   axios.post('http://127.0.0.1:8000/recievedAddress/', {'address': address})
     .then(res => {
-      console.log("RESULT")
       console.log(res)
       console.log(res.data.address)
       console.log("RESULT")
 
       setID(res.data.address)
+      console.log(res.data.address)
+      console.log(res.data.address.split(","))
+      console.log("RESULT")
+
+      setListSection([{
+      title: "Avaliable",
+      data: [
+        {
+          id: "1",
+          task: "Agent ID: " + res.data.address.split(",")[0],
+        },
+        {
+          id: "2",
+          task: "Agent ID: " + res.data.address.split(",")[1],
+        },
+       
+      ]
+  
+      }])
+
+      state(!showList)
+
     }
     
     ).catch(e => {
@@ -299,9 +306,6 @@ const sendAddress = () => {
      
     <View style={{flexDirection:"row"}}>
       <View style={{flex:1}}>
-            <Text>
-              {id_agents} 
-            </Text>
           <TextInput placeholder="Input Address" 
           placeholderTextColor="gray" 
           onChangeText={newText => setAddress(newText)}
@@ -331,7 +335,7 @@ const sendAddress = () => {
    />
      {showList ? (
               <SectionList
-          sections={[...newTaskData]}
+          sections={[...listSection]}
           renderItem={({item})=>(
               <Text style={styles.taskItem}>{item.task}</Text>
           )}
