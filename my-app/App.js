@@ -9,8 +9,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
 import { Marker } from "react-native-maps";
 import moment from 'moment';
-//import '@mobiscroll/react/dist/css/mobiscroll.min.css';
-//import { Datepicker } from '@mobiscroll/react';
+
 import axios from 'axios'; 
 import { RectButton } from 'react-native-gesture-handler';
 class MyCalendar extends React.Component {
@@ -213,7 +212,44 @@ function CaseNumber({ navigation }) {
     </View>
     
     
-  
+    {showCalendar ? (<Calendar
+              markingType={'multi-dot'}
+
+          markedDates={{
+        '2022-03-16': {selected: true, marked: true, selectedColor: 'blue'},
+        '2022-03-17': {dots: [vacation, massage, workout],marked: true},
+        '2022-03-18': {dots: [vacation, massage, workout],marked: true, dotColor: 'red', activeOpacity: 0},
+        '2022-03-25': {dots: [workout], selected: true, selectedColor: 'red'},
+
+        '2022-03-19': {dots: [vacation, workout],disabled: true, disableTouchEvent: true}
+      }}
+              // Initially visible month. Default = Date()
+              current={'2022-03-05'}
+              // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
+              minDate={'2032-05-10'}
+              // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
+              maxDate={'2032-05-30'}
+              // Handler which gets executed on day press. Default = undefined
+              onDayPress={day => {
+                console.log('selected day', day);
+              }}
+              // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
+              monthFormat={'yyyy MM'}
+              // Handler which gets executed when visible month changes in calendar. Default = undefined
+              onMonthChange={month => {
+                console.log('month changed', month);
+              }}
+              // Hide month navigation arrows. Default = false
+              hideArrows={false}
+              // Do not show days of other months in month page. Default = false
+              hideExtraDays={true}
+              // If hideArrows=false and hideExtraDays=false do not swich month when tapping on greyed out
+              // day from another month that is visible in calendar page. Default = false
+              disableMonthChange={false}
+              // If firstDay=1 week starts from Monday. Note that dayNames and dayNamesShort should still start from Sunday.
+              firstDay={1}
+            />
+        ) : null}
 
     <Separator />
   
@@ -226,7 +262,7 @@ function CaseNumber({ navigation }) {
 
 
 function InvestigatorCanvas({ navigation }) {
-  const [text, onChangeText] = React.useState("Enter Case Number");
+  const [language, onChangeLanguage] = React.useState('');
   const [number, onChangeNumber] = React.useState(null);
   const [showList, state] = React.useState(false);
   const [result, setResult] =  React.useState("Test"); 
@@ -244,7 +280,27 @@ const [listSection, setListSection] = React.useState([{
       task: "Agent B: 2373"
     },
    
-  ]
+  ],
+  title: "UnAvaliable",
+      data: [
+        {
+          id: "3",
+          task: "Agent ID: " + 6400,
+        },
+        {
+          id: "4",
+          task: "Agent ID: " + 9231,
+        },
+        {
+          id: "5",
+          task: "Agent ID: " + 1234,
+        },
+        {
+          id: "6",
+          task: "Agent ID: " + 4561,
+        },
+      ]
+  
 }]);
 
 
@@ -272,6 +328,26 @@ const sendAddress = () => {
           task: "Agent ID: " + res.data.address.split(",")[1],
         },
        
+      ]},
+      {
+      title: "UnAvaliable",
+      data: [
+        {
+          id: "3",
+          task: "Agent ID: " + 6400,
+        },
+        {
+          id: "4",
+          task: "Agent ID: " + 9231,
+        },
+        {
+          id: "5",
+          task: "Agent ID: " + 1234,
+        },
+        {
+          id: "6",
+          task: "Agent ID: " + 4561,
+        },
       ]
   
       }])
@@ -312,13 +388,16 @@ const sendAddress = () => {
           defaultValue={address}
           style={styles.input} />
       </View>
+      <View style={{flex:1}}>
+          <TextInput placeholder="Input Language" 
+          placeholderTextColor="gray" 
+          onChangeText={language}
+          style={styles.input} />
+      </View>
      </View>
      
      <View style={{flexDirection:"column"}}>
      <View>
-     <Text>
-        {address} 
-      </Text>
      <Button
         title="Available Investigators"
         color="#669fa8"
