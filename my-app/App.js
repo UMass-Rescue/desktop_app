@@ -4,125 +4,20 @@ TouchableWithoutFeedback, Keyboard
 } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+//import MapView from 'react-native-maps';
 import MapView from 'react-native-maps';
+import { GoogleMap, Marker } from "react-google-maps"
+
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
-import { Marker } from "react-native-maps";
+//import { Marker } from "react-native-maps";
 import moment from 'moment';
+import CalendarPicker from 'react-native-calendar-picker';
+import RenderHtml from 'react-native-render-html';
 
 import axios from 'axios'; 
 import { RectButton } from 'react-native-gesture-handler';
-class MyCalendar extends React.Component {
-  months = ["January", "February", "March", "April", 
- "May", "June", "July", "August", "September", "October", 
- "November", "December"];
-
- weekDays = [
-     "Sun","Mon","Tue","Wed","Thu","Fri","Sat"
- ]; 
- nDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
- state = {
-  activeDate: new Date()
-} 
-
-setMonth = month => {  
-  let monthNo = this.months.indexOf(month);// get month number  
-  let dateObject = Object.assign({}, this.state.dateObject);  
-  dateObject = moment(dateObject).set("month", monthNo); // change month value  
-  this.setState({  
-  dateObject: dateObject // add to state  
-  });  
-  };   
-
-  
-  render() {
-    var year = this.state.activeDate.getFullYear();
-    var month = this.state.activeDate.getMonth();
-    var firstDay = new Date(year, month, 1).getDay(); 
-    var maxDays = this.nDays[month];
-    if (month == 1) { // February
-      if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
-        maxDays += 1;
-      }
-    } 
-    changeMonth = (n) => {
-      this.setState(() => {
-        this.state.activeDate.setMonth(
-          this.state.activeDate.getMonth() + n
-        )
-        return this.state;
-      });
-  } 
-    props.data.map(data => {  
-      months.push(  
-      <td  
-      key={data}  
-      className="calendar-month"  
-      onClick={e => {  
-      this.setMonth(data);  
-      }}  
-      >  
-      <span>{data}</span>  
-      </td>  
-      );  
-      });   
-    var rows = [];
-    rows = matrix.map((row, rowIndex) => {
-      var rowItems = row.map((item, colIndex) => {
-        return (
-          <Text
-            style={{
-              flex: 1,
-              height: 18,
-              textAlign: 'center',
-              // Highlight header
-              backgroundColor: rowIndex == 0 ? '#ddd' : '#fff',
-              // Highlight Sundays
-              color: colIndex == 0 ? '#a00' : '#000',
-              // Highlight current date
-              fontWeight: item == this.state.activeDate.getDate() 
-                                  ? 'bold': ''
-            }}
-            onPress={() => this._onPress(item)}>
-            {item != -1 ? item : ''}
-          </Text>
-        );
-      });
-      return (
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            padding: 15,
-            justifyContent: 'space-around',
-            alignItems: 'center',
-          }}>
-          {rowItems}
-        </View>
-      );
-    }); 
-
-    return (
-      <View>
-      <Text style={{
-        fontWeight: 'bold',
-        fontSize: 18,
-        textAlign: 'center'
-      }}>
-        {this.months[this.state.activeDate.getMonth()]}  
-        {this.state.activeDate.getFullYear()}
-      </Text> 
-      <Button title="Previous"
-         onPress={() => this.changeMonth(-1)}/>
-       <Button title="Next"
-         onPress={() => this.changeMonth(+1)}/> 
-
-
-      </View>
-    );
-  }
-} 
-
+import GoogleApiWrapper from './googleMaps'
 const DismissKeyboard = ({children}) => (
   <TouchableWithoutFeedback onPress = {() => Keyboard.dismiss()}>
     [children]
@@ -132,8 +27,8 @@ const Separator = () => (
   <View style={styles.separator} />
 );
 
-
-
+var agent1 = "1234"
+const agent2 = "5678"
 const Stack = createNativeStackNavigator();
 const num  = 0;
 
@@ -166,30 +61,34 @@ function CaseNumber({ navigation }) {
     })
   }
 
+ 
+  const [state, setState] = React.useState({
+    selectedStartDate: null,
+    selectedEndDate: null,
+  });
+  const onDateChange = (date, type) => {
+    if (type === 'END_DATE') {
+      setState({
+        selectedEndDate: date,
+      });
+    } else {
+      setState({
+        selectedStartDate: date,
+        selectedEndDate: null,
+      });
+    }
+  }
+
+  const { selectedStartDate, selectedEndDate } = state;
+    const minDate = new Date(); // Today
+    const maxDate = new Date(2030, 12, 20);
+    const startDate  =  selectedStartDate ? selectedStartDate.toString() : '';
+    const endDate = selectedEndDate ? selectedEndDate.toString() : '';
 
   return (
     
     <SafeAreaView style={styles.container}>
-       <View style={{flexDirection:"row"}}>
-      <View style={{flex:1}}>
-
-          <Text>Start Date:</Text>
-
-          <TextInput placeholder="YYYY-MM-DD" placeholderTextColor="gray" style={styles.input} />
-      </View>
-      <View style={{flex:1}}>
-      <Text>End Date:</Text>
-          <TextInput placeholder="YYYY-MM-DD" placeholderTextColor="gray" style={styles.input} />
-      </View>
-     </View>
-
-     <Button
-        title="Submit"
-        color="#f194ff"
-        onPress={() => stateCalendar(!showCalendar)}
-      />
-
-    <Text>
+     <Text>
       Case Number:
     </Text>
       <TextInput 
@@ -202,54 +101,39 @@ function CaseNumber({ navigation }) {
         keyboardType="numeric"
       />
 
+     <Button
+        title="Calendar"
+        color="#f194ff"
+        onPress={() => stateCalendar(!showCalendar)}
+      />
+
     <Separator />
+
     <View>
+          <Text>SELECTED START DATE:{ startDate }</Text>
+          <Text>SELECTED END DATE:{ endDate }</Text>
+       </View>
+    
+    {showCalendar ? (   <CalendarPicker
+          startFromMonday={true}
+          allowRangeSelection={true}
+          minDate={minDate}
+          maxDate={maxDate}
+          todayBackgroundColor="#f2e6ff"
+          selectedDayColor="#7300e6"
+          selectedDayTextColor="#FFFFFF"
+          onDateChange={onDateChange}
+        />
+        
+        ) : null}
+
+        <View>
       <Button
         title="Canvas"
         color="#f194ff"
         onPress={() => navigation.navigate('Canvas')}
       />
     </View>
-    
-    
-    {showCalendar ? (<Calendar
-              markingType={'multi-dot'}
-
-          markedDates={{
-        '2022-03-16': {selected: true, marked: true, selectedColor: 'blue'},
-        '2022-03-17': {dots: [vacation, massage, workout],marked: true},
-        '2022-03-18': {dots: [vacation, massage, workout],marked: true, dotColor: 'red', activeOpacity: 0},
-        '2022-03-25': {dots: [workout], selected: true, selectedColor: 'red'},
-
-        '2022-03-19': {dots: [vacation, workout],disabled: true, disableTouchEvent: true}
-      }}
-              // Initially visible month. Default = Date()
-              current={'2022-03-05'}
-              // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
-              minDate={'2032-05-10'}
-              // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-              maxDate={'2032-05-30'}
-              // Handler which gets executed on day press. Default = undefined
-              onDayPress={day => {
-                console.log('selected day', day);
-              }}
-              // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
-              monthFormat={'yyyy MM'}
-              // Handler which gets executed when visible month changes in calendar. Default = undefined
-              onMonthChange={month => {
-                console.log('month changed', month);
-              }}
-              // Hide month navigation arrows. Default = false
-              hideArrows={false}
-              // Do not show days of other months in month page. Default = false
-              hideExtraDays={true}
-              // If hideArrows=false and hideExtraDays=false do not swich month when tapping on greyed out
-              // day from another month that is visible in calendar page. Default = false
-              disableMonthChange={false}
-              // If firstDay=1 week starts from Monday. Note that dayNames and dayNamesShort should still start from Sunday.
-              firstDay={1}
-            />
-        ) : null}
 
     <Separator />
   
@@ -268,6 +152,8 @@ function InvestigatorCanvas({ navigation }) {
   const [result, setResult] =  React.useState("Test"); 
   const [address, setAddress] = React.useState('');
   const [id_agents, setID] = React.useState('');
+  agent1 = "xxxx"
+
 const [listSection, setListSection] = React.useState([{
   title: "Avaliable",
    data: [
@@ -305,7 +191,7 @@ const [listSection, setListSection] = React.useState([{
 
 
 const sendAddress = () => {
-  axios.post('http://127.0.0.1:8000/recievedAddress/', {'address': address})
+  axios.post('http://127.0.0.1:8000/recievedAddress/', {'address': address, 'language': language})
     .then(res => {
       console.log(res)
       console.log(res.data.address)
@@ -315,7 +201,7 @@ const sendAddress = () => {
       console.log(res.data.address)
       console.log(res.data.address.split(","))
       console.log("RESULT")
-
+      agent1 = res.data.address.split(",")[0]
       setListSection([{
       title: "Avaliable",
       data: [
@@ -523,42 +409,74 @@ function MapScreen() {
     longitudeDelta: 0.01,
   };
 
-  
+  const source = {
+    html: `
+    <!DOCTYPE html>
+    <!--
+     @license
+     Copyright 2019 Google LLC. All Rights Reserved.
+     SPDX-License-Identifier: Apache-2.0
+    -->
+    <html>
+      <head>
+        <title>Add Map</title>
+        <style>
+    
+    #map {
+      height: 100%;
+      /* The height is 400 pixels */
+      width: 100%;
+      /* The width is the width of the web page */
+    }
+        </style>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    
+        <link rel="stylesheet" type="text/css" href="./style.css" />
+        <script type="module" src="./index.js"></script>
+      </head>
+      <body>
+        <h3>My Google Maps Demo</h3>
+        <!--The div element for the map -->
+        <div id="map"></div>
+    <script>
+        // Initialize and add the map
+    function initMap() {
+      // The location of Uluru
+      const uluru = { lat: -25.344, lng: 131.031 };
+      // The map, centered at Uluru
+      const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 4,
+        center: uluru,
+      });
+      // The marker, positioned at Uluru
+      const marker = new google.maps.Marker({
+        position: uluru,
+        map: map,
+      });
+    }
+    
+    window.initMap = initMap;
+        </script>
+        <!-- 
+         The attribute causes the callback to execute after the full HTML
+         document has been parsed. For non-blocking uses, avoiding race conditions,
+         and consistent behavior across browsers, consider loading using Promises
+         with https://www.npmjs.com/package/@googlemaps/js-api-loader.
+        -->
+        <script
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly"
+          defer
+        ></script>
+      </body>
+    </html>
+    `
+  };
 
 
   return (
-      <View style={styles.containerMap}>
-    {/*Render our MapView*/}
-      <MapView
-        style={styles.map}
-        //specify our coordinates.
-        initialRegion={{
-          latitude: 37.78825,
-          longitude: -122.4324,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
-        >
-         <Marker coordinate={location}>
-          <CustomMarker name="Location"/>
-        </Marker>
-
-        <Marker coordinate={coordinate6}>
-          <CustomMarkerAgents id="2373"/>
-        </Marker>
-        <Marker coordinate={coordinate6} />
-
-        <Marker coordinate={coordinate1}>
-          <CustomMarkerAgents id="2345"/>
-        </Marker>
-
-         <Marker coordinate={coordinate1} />
-
-
-      </MapView>
-
- 
-
+    <View style={{ marginTop: 30, marginBottom:75}}>    
+    <GoogleApiWrapper
+      />
 
     </View>
 
