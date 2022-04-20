@@ -18,6 +18,8 @@ import RenderHtml from 'react-native-render-html';
 import axios from 'axios'; 
 import { RectButton } from 'react-native-gesture-handler';
 import GoogleApiWrapper from './googleMaps'
+import SimpleMap from './SimpleMap'
+
 const DismissKeyboard = ({children}) => (
   <TouchableWithoutFeedback onPress = {() => Keyboard.dismiss()}>
     [children]
@@ -31,7 +33,7 @@ var agent1 = "1234"
 const agent2 = "5678"
 const Stack = createNativeStackNavigator();
 const num  = 0;
-
+var input_address = ""
 function CaseNumber({ navigation }) {
   const [text, onChangeText] = React.useState("Enter Case Number");
   const [number, onChangeNumber] = React.useState(null);
@@ -195,6 +197,10 @@ const sendAddress = () => {
     .then(res => {
       console.log(res)
       console.log(res.data.address)
+      "Input Address"
+      input_address = address
+      console.log(input_address)
+
       console.log("RESULT")
 
       setID(res.data.address)
@@ -245,6 +251,9 @@ const sendAddress = () => {
     ).catch(e => {
       console.log(e)
       console.log(address)
+      input_address = address
+      console.log(input_address)
+
     });
 /*
     try{
@@ -409,73 +418,17 @@ function MapScreen() {
     longitudeDelta: 0.01,
   };
 
-  const source = {
-    html: `
-    <!DOCTYPE html>
-    <!--
-     @license
-     Copyright 2019 Google LLC. All Rights Reserved.
-     SPDX-License-Identifier: Apache-2.0
-    -->
-    <html>
-      <head>
-        <title>Add Map</title>
-        <style>
-    
-    #map {
-      height: 100%;
-      /* The height is 400 pixels */
-      width: 100%;
-      /* The width is the width of the web page */
-    }
-        </style>
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    
-        <link rel="stylesheet" type="text/css" href="./style.css" />
-        <script type="module" src="./index.js"></script>
-      </head>
-      <body>
-        <h3>My Google Maps Demo</h3>
-        <!--The div element for the map -->
-        <div id="map"></div>
-    <script>
-        // Initialize and add the map
-    function initMap() {
-      // The location of Uluru
-      const uluru = { lat: -25.344, lng: 131.031 };
-      // The map, centered at Uluru
-      const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 4,
-        center: uluru,
-      });
-      // The marker, positioned at Uluru
-      const marker = new google.maps.Marker({
-        position: uluru,
-        map: map,
-      });
-    }
-    
-    window.initMap = initMap;
-        </script>
-        <!-- 
-         The attribute causes the callback to execute after the full HTML
-         document has been parsed. For non-blocking uses, avoiding race conditions,
-         and consistent behavior across browsers, consider loading using Promises
-         with https://www.npmjs.com/package/@googlemaps/js-api-loader.
-        -->
-        <script
-          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly"
-          defer
-        ></script>
-      </body>
-    </html>
-    `
-  };
+  const [newAddress, onChangeNewAddress] = React.useState('');
 
 
   return (
     <View style={{ marginTop: 30, marginBottom:75}}>    
-    <GoogleApiWrapper
+    <TextInput placeholder="Change Address" 
+          placeholderTextColor="gray" 
+          onChangeText={newText => onChangeNewAddress(newText)}
+          defaultValue={input_address}
+          style={styles.input} />
+    <SimpleMap
       />
 
     </View>
